@@ -88,4 +88,24 @@ public class GlobalExceptionHandler {
             .body(errorResponse);
   }
 
+  @ExceptionHandler(InvalidOperationException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidOperation(
+          InvalidOperationException exception,
+          HttpServletRequest request
+  ) {
+
+    ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.BAD_REQUEST.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI(),
+            null
+    );
+
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(errorResponse);
+  }
+
 }
