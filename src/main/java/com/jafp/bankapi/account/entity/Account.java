@@ -96,4 +96,24 @@ public class Account extends BaseEntity{
   public void initializeBalance(){
     this.balance = BigDecimal.ZERO;
   }
+
+  public void deposit(BigDecimal amount){
+
+    if(amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
+      throw new IllegalArgumentException(
+              "Deposit amount must be greater than zero"
+      );
+    }
+
+    this.balance = this.balance.add(amount);
+  }
+
+  public boolean hasAvailableBalance(BigDecimal amount){
+    return this.balance.compareTo(amount) >= 0;
+  }
+
+  public void withdraw(BigDecimal amount){
+
+    this.balance = this.balance.subtract(amount);
+  }
 }
