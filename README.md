@@ -1,36 +1,67 @@
 # Bank API
 
-API bancaria desarrollada con Java y Spring Boot, orientada a la gestión de clientes, cuentas y operaciones financieras.
+API bancaria desarrollada con **Java 25 y Spring Boot 4**, orientada a la gestión de clientes, cuentas bancarias, transacciones y autenticación de usuarios.
 
-## Descripción
-
-Bank API es un proyecto backend que simula las operaciones principales de un sistema bancario, aplicando buenas prácticas de desarrollo utilizadas en aplicaciones empresariales.
-
-El proyecto busca construir una API escalable y mantenible aplicando:
+Proyecto backend desarrollado aplicando buenas prácticas utilizadas en aplicaciones empresariales como:
 
 * Arquitectura por capas.
 * Separación de responsabilidades.
-* DTOs para transferencia de información.
+* DTO Pattern.
 * Validaciones.
 * Manejo global de excepciones.
 * Persistencia con JPA/Hibernate.
-* Mapeo automático con MapStruct.
-* Contenerización del entorno con Docker.
+* Migraciones con Flyway.
+* Seguridad mediante JWT.
+* Testing con JUnit 5 y Mockito.
+* Contenerización con Docker.
+
+---
+
+# Descripción
+
+Bank API es un proyecto backend que simula operaciones principales de un sistema bancario.
+
+El objetivo del proyecto es construir una API escalable y mantenible aplicando principios de desarrollo profesional utilizados en entornos empresariales.
+
+Actualmente cuenta con módulos para:
+
+* Gestión de clientes.
+* Gestión de cuentas bancarias.
+* Gestión de transacciones financieras.
+* Autenticación y autorización de usuarios.
 
 ---
 
 # Tecnologías utilizadas
 
-* Java (JDK 25)
+## Backend
+
+* Java 25
 * Spring Boot 4
 * Spring Web
 * Spring Data JPA
 * Hibernate
-* PostgreSQL 17
+* Spring Security
+* JWT Authentication
 * MapStruct
+* Bean Validation
 * Gradle
+
+## Base de datos
+
+* PostgreSQL 17
+* Flyway Migration
+
+## Testing
+
+* JUnit 5
+* Mockito
+
+## Herramientas
+
 * Docker
 * Docker Compose
+* Swagger/OpenAPI
 * Git
 
 ---
@@ -39,34 +70,117 @@ El proyecto busca construir una API escalable y mantenible aplicando:
 
 Para ejecutar el proyecto se requiere:
 
-* JDK 25
-* Gradle
-* Docker Desktop
-* Git
+- Docker Desktop
+- Git
 
-La base de datos PostgreSQL se ejecuta mediante Docker Compose, por lo que no es necesario instalar PostgreSQL directamente en la máquina local.
+La aplicación Spring Boot y PostgreSQL son ejecutados mediante Docker Compose.
+
+No es necesario instalar directamente:
+
+- JDK
+- Gradle
+- PostgreSQL
+
+en la máquina local.
 
 ---
 
-# Configuración del entorno con Docker
+# Arquitectura del proyecto
 
-El proyecto utiliza Docker Compose para levantar el servicio de PostgreSQL.
-
-El archivo:
+El proyecto utiliza una arquitectura basada en capas:
 
 ```text
-docker-compose.yml
+controller
+     |
+     ↓
+service
+     |
+     ↓
+repository
+     |
+     ↓
+database
 ```
 
-contiene la configuración del contenedor de base de datos.
+---
 
-Servicio utilizado:
+# Seguridad
+
+La API implementa autenticación basada en JWT utilizando Spring Security.
+
+Características:
+
+* Login mediante usuario y contraseña.
+* Generación de token JWT.
+* Validación de token mediante filtro personalizado.
+* Protección de endpoints privados.
+* Implementación de UserDetailsService.
+
+---
+
+## Login
+
+Endpoint:
+
+```http
+POST /api/v1/auth/login
+```
+
+Request:
+
+```json
+{
+  "username": "admin",
+  "password": "Admin123"
+}
+```
+
+Response:
+
+```json
+{
+  "token": "jwt-token"
+}
+```
+
+El token generado permite acceder a endpoints protegidos.
+
+---
+
+# Base de datos y migraciones
+
+El proyecto utiliza Flyway para administrar cambios en la estructura de base de datos.
+
+Características:
+
+* Versionamiento de scripts SQL.
+* Creación automática de tablas.
+* Control de historial de migraciones.
+* Integración con Spring Boot.
+
+Ubicación:
 
 ```text
-PostgreSQL 17
+src/main/resources/db/migration
 ```
 
-Configuración:
+---
+
+# Ejecución con Docker
+
+El proyecto utiliza Docker Compose para levantar:
+
+* Aplicación Spring Boot.
+* PostgreSQL 17.
+
+Servicios:
+
+```text
+bank-api
+postgres
+```
+
+Configuración PostgreSQL:
 
 ```text
 Database: bank_db
@@ -75,104 +189,60 @@ Password: postgres
 Port: 5432
 ```
 
-Para iniciar la base de datos ejecutar:
+---
+
+## Levantar contenedores
+
+Ejecutar:
 
 ```bash
 docker compose up
 ```
 
-Para detener los contenedores:
+---
+
+## Detener contenedores
 
 ```bash
 docker compose down
 ```
 
-Los datos de PostgreSQL se mantienen mediante un volumen:
+---
+
+## Persistencia de datos
+
+PostgreSQL utiliza un volumen Docker:
 
 ```text
 postgres_data
 ```
 
-permitiendo conservar la información aunque el contenedor sea detenido.
+permitiendo conservar información aunque el contenedor sea detenido.
 
 ---
 
-# Arquitectura del proyecto
+# Documentación API
 
-El proyecto utiliza una arquitectura en capas:
+La API cuenta con documentación interactiva mediante Swagger/OpenAPI.
+
+Swagger permite:
+
+* Visualizar endpoints disponibles.
+* Ejecutar pruebas HTTP.
+* Probar autenticación JWT.
+* Revisar modelos Request/Response.
+
+URL:
 
 ```text
-controller
-    |
-    ↓
-service
-    |
-    ↓
-repository
-    |
-    ↓
-database
-```
-
-## Capas principales
-
-### Controller
-
-Responsable de exponer los endpoints REST y gestionar las solicitudes HTTP.
-
-### Service
-
-Contiene la lógica de negocio y las reglas del sistema.
-
-### Repository
-
-Encargado del acceso a datos mediante Spring Data JPA.
-
-### Entity
-
-Representa las entidades persistidas en la base de datos.
-
-### DTO
-
-Objetos utilizados para transportar información entre capas evitando exponer directamente las entidades.
-
-### Mapper
-
-Responsable de convertir entidades a DTOs y viceversa utilizando MapStruct.
-
----
-
-# Ejecución del proyecto
-
-Clonar el repositorio:
-
-```bash
-git clone <repository-url>
-```
-
-Ingresar al proyecto:
-
-```bash
-cd bank-api
-```
-
-Levantar la base de datos:
-
-```bash
-docker compose up
-```
-
-Ejecutar la aplicación:
-
-```bash
-./gradlew bootRun
+http://localhost:8080/swagger-ui/index.html
 ```
 
 ---
 
 # Módulos implementados
 
-## Client
+# Client
 
 Gestión de clientes bancarios.
 
@@ -182,9 +252,9 @@ Funcionalidades:
 * Consultar clientes.
 * Buscar cliente por ID.
 * Actualizar información.
-* Soft delete mediante cambio de estado.
+* Eliminación lógica mediante cambio de estado.
 
-Estados disponibles:
+Estados:
 
 ```text
 ACTIVE
@@ -194,7 +264,7 @@ INACTIVE
 
 ---
 
-## Account
+# Account
 
 Gestión de cuentas bancarias.
 
@@ -206,14 +276,14 @@ Funcionalidades:
 * Validación de cliente activo.
 * Validación de cuentas duplicadas por tipo.
 
-Tipos de cuenta:
+Tipos:
 
 ```text
 SAVINGS
 CHECKING
 ```
 
-Estados disponibles:
+Estados:
 
 ```text
 ACTIVE
@@ -223,9 +293,23 @@ CLOSED
 
 ---
 
-# Manejo global de errores
+# Transaction
 
-La API implementa manejo centralizado de excepciones mediante:
+Gestión de movimientos financieros asociados a cuentas bancarias.
+
+Funcionalidades:
+
+* Registro de depósitos.
+* Registro de retiros.
+* Transferencias entre cuentas.
+* Actualización de saldo.
+* Historial de movimientos.
+
+---
+
+# Manejo global de excepciones
+
+La API implementa manejo centralizado mediante:
 
 ```java
 @RestControllerAdvice
@@ -233,55 +317,89 @@ La API implementa manejo centralizado de excepciones mediante:
 
 Errores manejados:
 
-| Código HTTP | Descripción           |
-| ----------- | --------------------- |
-| 400         | Error de validación   |
-| 404         | Recurso no encontrado |
-| 409         | Recurso duplicado     |
+| Código | Descripción |
+| ------ | ----------- |
+| 400 | Error de validación |
+| 404 | Recurso no encontrado |
+| 409 | Recurso duplicado |
 
-Ejemplo de respuesta:
+Ejemplo:
 
 ```json
 {
-    "timestamp": "2026-08-23T10:00:00",
-    "status": 404,
-    "error": "NOT FOUND",
-    "message": "Client not found",
-    "path": "/api/v1/clients/10"
+ "timestamp":"2026-09-11T10:00:00",
+ "status":404,
+ "error":"NOT FOUND",
+ "message":"Client not found",
+ "path":"/api/v1/clients/10"
 }
+```
+
+---
+
+# Testing
+
+El proyecto implementa pruebas unitarias utilizando:
+
+* JUnit 5.
+* Mockito.
+
+Actualmente se realizan pruebas sobre la capa Service.
+
+Incluye:
+
+* Validación de creación correcta.
+* Validación de datos duplicados.
+* Pruebas de excepciones.
+* Verificación de comportamiento mediante mocks.
+
+Ejemplo:
+
+```text
+ClientServiceTest
 ```
 
 ---
 
 # Endpoints principales
 
+## Authentication
+
+Login:
+
+```http
+POST /api/v1/auth/login
+```
+
+---
+
 ## Clients
 
-### Obtener clientes
+Obtener clientes:
 
 ```http
 GET /api/v1/clients
 ```
 
-### Buscar cliente por ID
+Buscar cliente:
 
 ```http
 GET /api/v1/clients/{id}
 ```
 
-### Crear cliente
+Crear cliente:
 
 ```http
 POST /api/v1/clients
 ```
 
-### Actualizar cliente
+Actualizar cliente:
 
 ```http
 PUT /api/v1/clients/{id}
 ```
 
-### Eliminar cliente (Soft Delete)
+Eliminar cliente:
 
 ```http
 DELETE /api/v1/clients/{id}
@@ -291,19 +409,19 @@ DELETE /api/v1/clients/{id}
 
 ## Accounts
 
-### Obtener cuentas
+Obtener cuentas:
 
 ```http
 GET /api/v1/accounts
 ```
 
-### Buscar cuenta por ID
+Buscar cuenta:
 
 ```http
 GET /api/v1/accounts/{id}
 ```
 
-### Crear cuenta
+Crear cuenta:
 
 ```http
 POST /api/v1/accounts
@@ -311,17 +429,29 @@ POST /api/v1/accounts
 
 ---
 
+## Transactions
+
+Registrar movimiento:
+
+```http
+POST /api/v1/transactions
+```
+
+Consultar movimientos:
+
+```http
+GET /api/v1/transactions
+```
+
+Buscar movimiento por ID:
+
+```http
+GET /api/v1/transactions/{id}
+```
+
+---
+
 # Próximos módulos
-
-## Transaction
-
-Gestión de movimientos bancarios:
-
-* Depósitos.
-* Retiros.
-* Transferencias.
-* Historial de movimientos.
-* Actualización de saldo.
 
 ## Loan
 
@@ -329,30 +459,43 @@ Gestión de préstamos:
 
 * Solicitudes.
 * Evaluación.
-* Estados del préstamo.
+* Estados.
 * Desembolso.
+
+---
 
 ## Card
 
 Gestión de tarjetas:
 
-* Creación de tarjetas.
+* Creación.
 * Estados.
-* Relación con cuentas.
+* Asociación con cuentas.
 
 ---
 
 # Control de versiones
 
-El proyecto utiliza Git para el control de cambios.
+El proyecto utiliza Git para control de cambios.
 
-Convención de commits:
+Convención utilizada:
 
-* `feat:` nuevas funcionalidades.
-* `fix:` correcciones.
-* `refactor:` mejoras internas.
-* `docs:` documentación.
-* `test:` pruebas.
+```text
+feat:
+Nueva funcionalidad
+
+fix:
+Corrección de errores
+
+refactor:
+Mejoras internas
+
+docs:
+Cambios de documentación
+
+test:
+Pruebas automatizadas
+```
 
 ---
 
@@ -362,4 +505,4 @@ Joel Anderson Fernandez Pancorvo
 
 Backend Developer Java
 
-Proyecto realizado con fines de aprendizaje y construcción de portafolio profesional.
+Proyecto desarrollado como portafolio profesional para fortalecer conocimientos en desarrollo backend con Java y Spring Boot.
